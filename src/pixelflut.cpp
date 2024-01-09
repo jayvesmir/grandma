@@ -1,11 +1,17 @@
 #include "pixelflut.hpp"
 #include "image.hpp"
+#include "ray_tracing/grandma.hpp"
+#include <algorithm>
 #include <cctype>
+#include <execution>
 #include <format>
 #include <print>
+#include <random>
+#include <ranges>
 
 pixelflut_client::pixelflut_client(const std::string& addr,
-                                   const std::string& port) {
+                                   const std::string& port,
+                                   const std::string& font) {
     auto res = WSAStartup(MAKEWORD(2, 2), &_wsa_data);
     if (res)
         throw std::runtime_error(std::format("WSAStartup() failed: {}", res));
@@ -28,6 +34,8 @@ pixelflut_client::pixelflut_client(const std::string& addr,
     res = connect(_socket, _addrinfo->ai_addr, _addrinfo->ai_addrlen);
     if (res)
         throw std::runtime_error(std::format("connect() failed: {}", res));
+
+    _font = sft_loadfile(font.c_str());
 }
 
 pixelflut_client::~pixelflut_client() {
@@ -52,7 +60,7 @@ std::string pixelflut_client::read_msg() {
     return buf;
 }
 
-vec2<int32_t> pixelflut_client::read_size() {
+vec2<uint32_t> pixelflut_client::read_size() {
     send_msg("SIZE\n");
     auto buf = read_msg();
 
@@ -67,8 +75,11 @@ vec2<int32_t> pixelflut_client::read_size() {
     auto str = std::string(buf.data() + 5, xlen - 1);
     str      = std::string(buf.data() + 5 + xlen, ylen - 1);
 
-    return {std::stoi(std::string(buf.data() + 5, xlen - 1)),
-            std::stoi(std::string(buf.data() + 5 + xlen, ylen - 1))};
+    return {
+        static_cast<uint32_t>(std::stoi(std::string(buf.data() + 5, xlen - 1))),
+        static_cast<uint32_t>(
+            std::stoi(std::string(buf.data() + 5 + xlen, ylen - 1))),
+    };
 }
 
 void pixelflut_client::send_pixel(uint32_t x, uint32_t y,
@@ -78,10 +89,37 @@ void pixelflut_client::send_pixel(uint32_t x, uint32_t y,
 }
 
 void pixelflut_client::send_image(uint32_t x_off, uint32_t y_off,
+                                  const image& img) {
+    std::ranges::iota_view x_iota(0, img.width());
+    std::ranges::iota_view y_iota(0, img.height());
+
+    std::for_each(
+        std::execution::par_unseq, x_iota.begin(), x_iota.end(), [&](auto x) {
+            std::for_each(std::execution::par_unseq, y_iota.begin(),
+                          y_iota.end(), [&](auto y) {
+                              send_pixel(x + x_off, y + y_off, img.get(x, y));
+                          });
+        });
+}
+
+void pixelflut_client::send_image(uint32_t x_off, uint32_t y_off,
                                   const std::string& filepath) {
     image img(filepath);
-    img.resize(512, 512);
-    for (auto x = 0; x < img.width(); x++)
-        for (auto y = 0; y < img.height(); y++)
-            send_pixel(x + x_off, y + y_off, img.get(x, y));
+    img.resize(128, 128);
+    send_image(x_off, y_off, img);
+}
+
+void pixelflut_client::trace_rays() {
+    auto size = read_size();
+    std::ranges::iota_view x_iota(0u, size.x);
+    std::ranges::iota_view y_iota(0u, size.y);
+
+    raytracer::grandma granny(size.x, size.y);
+
+    std::for_each(
+        std::execution::par_unseq, x_iota.begin(), x_iota.end(), [&](auto x) {
+            std::for_each(
+                std::execution::par, y_iota.begin(), y_iota.end(),
+                [&](auto y) { send_pixel(x, y, granny.compute_pixel(x, y)); });
+        });
 }

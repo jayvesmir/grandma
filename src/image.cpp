@@ -1,4 +1,6 @@
 #include "image.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/mat2x2.hpp"
 #include <format>
 #include <stdexcept>
 
@@ -15,7 +17,17 @@ image::image(const std::string& filepath) {
     _pixels = {_, _ + (_width * _height * _comp)};
 }
 
+image::image(uint32_t width, uint32_t height)
+    : _width(width), _height(height), _comp(3) {
+    auto* _ = new vec3<uint8_t>[_width * _height];
+    _pixels = {_, _ + (_width * _height)};
+}
+
 image::~image() { std::free(_pixels.begin); }
+
+vec3<uint8_t> image::get(uint32_t x, uint32_t y) const {
+    return *(_pixels.begin + ((y * _width) + x));
+}
 
 void image::resize(int32_t new_width, int32_t new_height) {
 

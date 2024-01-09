@@ -10,6 +10,7 @@ add_executable(
     src/main.cpp
     src/image.cpp
     src/pixelflut.cpp
+    src/raytracer/grandma.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE lib${PROJECT_NAME})
