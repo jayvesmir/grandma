@@ -29,18 +29,10 @@ class pixelflut_client {
     vec2<uint32_t> read_size();
 
     void send_pixel(uint32_t x, uint32_t y, const vec3<uint8_t>& color);
+    void send_pixel(uint32_t x, uint32_t y, const vec4<uint8_t>& color);
     void send_image(uint32_t x_off, uint32_t y_off,
                     const std::string& filepath);
     void send_image(uint32_t x_off, uint32_t y_off, const image& img);
 
     void trace_rays();
-};
-
-struct render_job {
-    vec2<uint32_t> pos;
-    std::jthread worker;
-    pixelflut_client& client;
-    view<vec3<uint8_t>> pixels;
-
-    void launch();
 };
