@@ -13,8 +13,7 @@
 #pragma comment(lib, "AdvApi32.lib")
 
 pixelflut_client::pixelflut_client(const std::string& addr,
-                                   const std::string& port,
-                                   const std::string& font) {
+                                   const std::string& port) {
     auto res = WSAStartup(MAKEWORD(2, 2), &_wsa_data);
     if (res)
         throw std::runtime_error(std::format("WSAStartup() failed: {}", res));

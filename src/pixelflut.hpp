@@ -14,8 +14,7 @@ class pixelflut_client {
 
   public:
     ~pixelflut_client();
-    pixelflut_client(const std::string& addr, const std::string& port,
-                     const std::string& font = "roboto.ttf");
+    pixelflut_client(const std::string& addr, const std::string& port);
 
     std::string read_msg();
     void send_msg(const std::string& msg);

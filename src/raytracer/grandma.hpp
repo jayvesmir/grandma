@@ -4,6 +4,7 @@
 #include "glm/vec3.hpp"
 #include "scene.hpp"
 #include <cinttypes>
+#include <memory>
 
 namespace raytracer {
     class grandma {
@@ -11,8 +12,8 @@ namespace raytracer {
         uint32_t _width, _height;
 
       public:
-        grandma(scene scene, uint32_t width, uint32_t height)
-            : _scene(scene), _width(width), _height(height) {}
+        grandma(uint32_t width, uint32_t height)
+            : _scene(camera(width, height)), _width(width), _height(height) {}
 
         constexpr auto& width() { return _width; }
         constexpr auto& height() { return _height; }
