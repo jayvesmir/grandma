@@ -47,6 +47,6 @@ namespace raytracer {
 
         void pop_object() { _objects.pop_back(); }
 
-        rt_vec3 trace_ray(uint32_t x, uint32_t y);
+        rt_vec3 trace_ray(uint32_t x, uint32_t y) const;
     };
 } // namespace raytracer

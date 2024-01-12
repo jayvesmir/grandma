@@ -15,6 +15,6 @@ namespace raytracer {
         constexpr const auto& origin() const { return _origin; }
         constexpr const auto& direction() const { return _direction; }
 
-        rt_vec3 lerp(rt_scalar t) const;
+        rt_vec3 at(rt_scalar t) const;
     };
 } // namespace raytracer

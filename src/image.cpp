@@ -1,7 +1,10 @@
 #include "image.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/mat2x2.hpp"
+#include <algorithm>
+#include <execution>
 #include <format>
+#include <ranges>
 #include <stdexcept>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -38,4 +41,20 @@ void image::resize(int32_t new_width, int32_t new_height) {
     _width  = new_width;
     _height = new_height;
     _pixels = {.begin = _, .end = _ + (_width * _height * _comp)};
+}
+
+std::vector<pixelflut_pt> image::map() const {
+    std::vector<pixelflut_pt> out(_width * _height);
+    auto x = 0, y = 0;
+    std::generate(std::execution::par_unseq, out.begin(), out.end(), [&]() {
+        pixelflut_pt pt = {{x, y}, get(x, y)};
+        if (x < _width)
+            x++;
+        else {
+            x = 0;
+            y++;
+        }
+        return pt;
+    });
+    return out;
 }

@@ -16,6 +16,7 @@ class image {
     constexpr auto height() const { return _height; }
     constexpr const auto& pixels() const { return _pixels; }
     vec3<uint8_t> get(uint32_t x, uint32_t y) const;
+    std::vector<pixelflut_pt> map() const;
 
     void resize(int32_t new_width, int32_t new_height);
 };

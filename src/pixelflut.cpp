@@ -1,6 +1,5 @@
 #include "pixelflut.hpp"
 #include "image.hpp"
-#include "raytracer/grandma.hpp"
 #include <algorithm>
 #include <cctype>
 #include <execution>
@@ -82,20 +81,20 @@ vec2<uint32_t> pixelflut_client::read_size() {
     };
 }
 
-void pixelflut_client::send_pixel(uint32_t x, uint32_t y,
+void pixelflut_client::send_pixel(int32_t x, int32_t y,
                                   const vec3<uint8_t>& color) {
     send_msg(std::format("PX {} {} {:x}\n", x, y,
                          (color.x << 16) | (color.y << 8) | (color.z << 0)));
 }
 
-void pixelflut_client::send_pixel(uint32_t x, uint32_t y,
+void pixelflut_client::send_pixel(int32_t x, int32_t y,
                                   const vec4<uint8_t>& color) {
     send_msg(std::format("PX {} {} {:x}\n", x, y,
                          (color.x << 24) | (color.y << 16) | (color.z << 8) |
                              (color.w << 0)));
 }
 
-void pixelflut_client::send_image(uint32_t x_off, uint32_t y_off,
+void pixelflut_client::send_image(int32_t x_off, int32_t y_off,
                                   const image& img) {
     std::ranges::iota_view x_iota(0, img.width());
     std::ranges::iota_view y_iota(0, img.height());
@@ -109,35 +108,14 @@ void pixelflut_client::send_image(uint32_t x_off, uint32_t y_off,
         });
 }
 
-void pixelflut_client::send_image(uint32_t x_off, uint32_t y_off,
-                                  const std::string& filepath) {
-    image img(filepath);
-    send_image(x_off, y_off, img);
-}
+void pixelflut_client::trace_rays(raytracer::grandma& granny) {
+    std::ranges::iota_view x_iota(0u, granny.width());
+    std::ranges::iota_view y_iota(0u, granny.height());
 
-void pixelflut_client::trace_rays() {
-    auto size = read_size();
-    size.x    = 512;
-    size.y    = 256;
-    std::ranges::iota_view x_iota(0u, size.x);
-    std::ranges::iota_view y_iota(0u, size.y);
-
-    raytracer::scene scene({size.x, size.y});
-    raytracer::grandma granny(scene, size.x, size.y);
-
-    auto sphere =
-        std::make_shared<raytracer::sphere>(rt_vec3{-1.0, 0.0, -1.0}, 0.5);
-    granny.scene().push_object(sphere);
-
-    while (true) {
-        std::for_each(std::execution::par_unseq, x_iota.begin(), x_iota.end(),
-                      [&](auto x) {
-                          std::for_each(
-                              std::execution::par, y_iota.begin(), y_iota.end(),
-                              [&](auto y) {
-                                  send_pixel(x, y, granny.compute_pixel(x, y));
-                              });
-                      });
-        sphere->pos(sphere->pos() + rt_vec3{0.1, 0.0, 0.0});
-    }
+    std::for_each(
+        std::execution::par_unseq, x_iota.begin(), x_iota.end(), [&](auto x) {
+            std::for_each(
+                std::execution::par, y_iota.begin(), y_iota.end(),
+                [&](auto y) { send_pixel(x, y, granny.compute_pixel(x, y)); });
+        });
 }
