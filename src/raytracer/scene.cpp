@@ -61,10 +61,12 @@ namespace raytracer {
         for (auto bounce = 0u; bounce < _max_bounces; bounce++) {
             auto hit = intersect_objects(
                 {closest.point.pos,
-                 random::vector_within_bounce_range(closest.point.normal)});
+                 static_cast<rt_scalar>(0.5) * closest.point.normal +
+                     random::vector_within_bounce_range(closest.point.normal)});
 
             if (hit.has_hit)
-                color *= 0.5 * hit.obj->sample(hit.point);
+                color *=
+                    static_cast<rt_scalar>(0.3) * hit.obj->sample(hit.point);
             else
                 break;
         }
@@ -76,6 +78,6 @@ namespace raytracer {
         rt_vec3 out_color(0.0, 0.0, 0.0);
         for (auto sample = 0u; sample < _max_samples; sample++)
             out_color += trace_ray({_camera.pos(), sample_direction(x, y)});
-        return out_color * (1.0 / _max_samples);
+        return glm::sqrt(out_color * (1.0 / _max_samples));
     };
 } // namespace raytracer
