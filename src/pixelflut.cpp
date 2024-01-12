@@ -8,6 +8,10 @@
 #include <random>
 #include <ranges>
 
+#pragma comment(lib, "Ws2_32.lib")
+#pragma comment(lib, "Mswsock.lib")
+#pragma comment(lib, "AdvApi32.lib")
+
 pixelflut_client::pixelflut_client(const std::string& addr,
                                    const std::string& port,
                                    const std::string& font) {
@@ -33,8 +37,6 @@ pixelflut_client::pixelflut_client(const std::string& addr,
     res = connect(_socket, _addrinfo->ai_addr, _addrinfo->ai_addrlen);
     if (res)
         throw std::runtime_error(std::format("connect() failed: {}", res));
-
-    _font = sft_loadfile(font.c_str());
 }
 
 pixelflut_client::~pixelflut_client() {
