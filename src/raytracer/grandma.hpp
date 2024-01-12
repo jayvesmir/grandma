@@ -12,13 +12,13 @@ namespace raytracer {
         uint32_t _width, _height;
 
       public:
-        grandma(uint32_t width, uint32_t height)
-            : _scene(camera(width, height)), _width(width), _height(height) {}
+        grandma(const scene& cam, uint32_t width, uint32_t height)
+            : _scene(cam), _width(width), _height(height) {}
 
-        constexpr auto& width() { return _width; }
-        constexpr auto& height() { return _height; }
+        constexpr auto width() { return _width; }
+        constexpr auto height() { return _height; }
         constexpr auto& scene() { return _scene; }
 
-        vec3<uint8_t> compute_pixel(uint32_t x, uint32_t y) const;
+        vec3<uint8_t> compute_pixel(uint32_t x, uint32_t y);
     };
 } // namespace raytracer

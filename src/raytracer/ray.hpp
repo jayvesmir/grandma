@@ -8,13 +8,15 @@ namespace raytracer {
         rt_vec3 _origin, _direction;
 
       public:
-        ray() = default;
-        ray(const rt_vec3& origin, const rt_vec3& direction)
+        constexpr ray() = default;
+        constexpr ray(const rt_vec3& origin, const rt_vec3& direction)
             : _origin(origin), _direction(direction) {}
 
         constexpr const auto& origin() const { return _origin; }
         constexpr const auto& direction() const { return _direction; }
 
-        rt_vec3 at(rt_scalar t) const;
+        constexpr auto at(rt_scalar t) const {
+            return _origin + (t * _direction);
+        }
     };
 } // namespace raytracer

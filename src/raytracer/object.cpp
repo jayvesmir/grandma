@@ -12,7 +12,7 @@ namespace raytracer {
         auto t           = std::min((-b - glm::sqrt(d)) / (2.0 * a),
                                     (-b + glm::sqrt(d)) / (2.0 * a));
         auto hit         = ray.at(t);
-        intersection out = {t, hit, (hit - _pos) / _radius, false};
+        intersection out = {t, hit, (hit - _pos) / _radius, ray, false};
         out.check_side(ray);
         return out;
     }

@@ -13,6 +13,17 @@ namespace raytracer {
         }
     };
 
+    class sky_mat : public material {
+        rt_vec3 _bottom_color, _top_color;
+
+      public:
+        sky_mat(const rt_vec3& bottom_color = rt_vec3(1.0, 1.0, 1.0),
+                const rt_vec3& top_color    = rt_vec3(0.5, 0.7, 1.0))
+            : _bottom_color(bottom_color), _top_color(top_color) {}
+
+        rt_vec3 sample(const intersection& p) override;
+    };
+
     class sphere_mat : public material {
         rt_vec3 _color;
         bool _return_normal;
