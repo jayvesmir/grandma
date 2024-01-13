@@ -24,13 +24,13 @@ namespace raytracer {
         rt_vec3 sample(const intersection& p) override;
     };
 
-    class sphere_mat : public material {
+    class matte_sphere_mat : public material {
         rt_vec3 _color;
         bool _return_normal;
 
       public:
-        sphere_mat() : _color({0.0, 0.0, 0.0}), _return_normal(true) {}
-        sphere_mat(const rt_vec3& color)
+        matte_sphere_mat() : _color({0.0, 0.0, 0.0}), _return_normal(true) {}
+        matte_sphere_mat(const rt_vec3& color)
             : _color(color), _return_normal(false) {}
 
         rt_vec3 sample(const intersection& p) override;

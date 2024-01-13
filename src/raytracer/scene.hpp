@@ -42,6 +42,7 @@ namespace raytracer {
 
     class scene {
         camera _camera;
+        rt_scalar _reflectance;
         uint32_t _max_bounces, _max_samples;
         std::shared_ptr<material> _background_mat;
         std::vector<std::shared_ptr<object>> _objects;
@@ -51,11 +52,12 @@ namespace raytracer {
 
       public:
         scene(const camera& camera, uint32_t max_bounces = 12,
-              uint32_t max_samples = 32,
+              uint32_t max_samples = 32, rt_scalar reflectance = 0.7,
               const std::shared_ptr<material>& background_mat =
                   std::make_shared<sky_mat>())
-            : _camera(camera), _max_bounces(max_bounces),
-              _max_samples(max_samples), _background_mat(background_mat) {}
+            : _camera(camera), _reflectance(reflectance),
+              _max_bounces(max_bounces), _max_samples(max_samples),
+              _background_mat(background_mat) {}
 
         constexpr auto& camera() { return _camera; }
         constexpr const auto& objects() const { return _objects; }

@@ -65,10 +65,11 @@ namespace raytracer {
                      random::vector_within_bounce_range(closest.point.normal)});
 
             if (hit.has_hit)
-                color *=
-                    static_cast<rt_scalar>(0.3) * hit.obj->sample(hit.point);
-            else
+                color *= _reflectance * hit.obj->sample(hit.point);
+            else {
+                color *= _reflectance * _background_mat->sample(hit.point);
                 break;
+            }
         }
 
         return color;
