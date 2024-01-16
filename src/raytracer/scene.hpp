@@ -17,14 +17,15 @@ namespace raytracer {
 
     class camera {
         uv _viewport_uv, _pixel_delta_uv;
-        rt_vec3 _pos, _top_left_corner;
-        rt_scalar _width, _height, _focal_length;
+        rt_vec3 _pos, _target, _up, _top_left_corner, _u, _v, _w;
+        rt_scalar _width, _height, _focal_length, _fov;
 
       public:
         camera() = default;
         camera(uint32_t image_width, uint32_t image_height,
-               rt_scalar viewport_height = 2.0, rt_scalar focal_length = 1.0,
-               rt_vec3 pos = rt_vec3(0.0, 0.0, 0.0));
+               rt_scalar fov = 90.0, rt_vec3 pos = rt_vec3(0.0, 0.0, 0.0),
+               rt_vec3 target = rt_vec3(0.0, 0.0, 0.0),
+               rt_vec3 up     = rt_vec3(0.0, 1.0, 0.0));
 
         constexpr const auto& pos() const { return _pos; }
         constexpr auto pos(const rt_vec3& pos) { _pos = pos; }

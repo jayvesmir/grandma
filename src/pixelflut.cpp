@@ -123,10 +123,11 @@ void pixelflut_client::trace_rays(raytracer::grandma& granny) {
     std::ranges::iota_view x_iota(0u, granny.width());
     std::ranges::iota_view y_iota(0u, granny.height());
 
+    // it looks cooler to render rows rather than columns :3
     std::for_each(
-        std::execution::par_unseq, x_iota.begin(), x_iota.end(), [&](auto x) {
+        std::execution::par_unseq, y_iota.begin(), y_iota.end(), [&](auto y) {
             std::for_each(
-                std::execution::par_unseq, y_iota.begin(), y_iota.end(),
-                [&](auto y) { send_pixel(x, y, granny.compute_pixel(x, y)); });
+                std::execution::par_unseq, x_iota.begin(), x_iota.end(),
+                [&](auto x) { send_pixel(x, y, granny.compute_pixel(x, y)); });
         });
 }

@@ -12,8 +12,8 @@ namespace raytracer {
         uint32_t _width, _height;
 
       public:
-        grandma(const scene& cam, uint32_t width, uint32_t height)
-            : _scene(cam), _width(width), _height(height) {}
+        grandma(const scene& scene, uint32_t width, uint32_t height)
+            : _scene(scene), _width(width), _height(height) {}
 
         constexpr auto width() { return _width; }
         constexpr auto height() { return _height; }

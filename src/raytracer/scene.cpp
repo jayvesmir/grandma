@@ -1,22 +1,31 @@
 #include "scene.hpp"
 #include "../random.hpp"
+#include "glm/glm.hpp"
 
 namespace raytracer {
-    camera::camera(uint32_t image_width, uint32_t image_height,
-                   rt_scalar viewport_height, rt_scalar focal_length,
-                   rt_vec3 pos)
-        : _pos(pos), _height(viewport_height), _focal_length(focal_length) {
+    camera::camera(uint32_t image_width, uint32_t image_height, rt_scalar fov,
+                   rt_vec3 pos, rt_vec3 target, rt_vec3 up)
+        : _pos(pos), _target(target), _up(up), _fov(fov) {
+        _focal_length = glm::length(_pos - _target);
+        _height       = static_cast<rt_scalar>(2.0) *
+                  glm::tan(glm::radians(_fov) / static_cast<rt_scalar>(2.0)) *
+                  _focal_length;
         _width = _height * (static_cast<rt_scalar>(image_width) / image_height);
+
+        _w = glm::normalize(_pos - _target);
+        _u = glm::normalize(glm::cross(_up, _w));
+        _v = glm::cross(_w, _u);
+
         _viewport_uv = {
-            .u = rt_vec3(_width, 0.0, 0.0),
-            .v = rt_vec3(0.0, -_height, 0.0),
+            .u = _width * _u,
+            .v = _height * -_v,
         };
         _pixel_delta_uv = {
             .u = _viewport_uv.u / static_cast<rt_scalar>(image_width),
             .v = _viewport_uv.v / static_cast<rt_scalar>(image_height),
         };
 
-        auto _ = _pos - rt_vec3(0, 0, _focal_length) -
+        auto _ = _pos - (_focal_length * _w) -
                  _viewport_uv.u / static_cast<rt_scalar>(2.0) -
                  _viewport_uv.v / static_cast<rt_scalar>(2.0);
         _top_left_corner = _ + static_cast<rt_scalar>(0.5) *
