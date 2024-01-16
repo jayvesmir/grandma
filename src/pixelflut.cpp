@@ -13,7 +13,8 @@
 #pragma comment(lib, "AdvApi32.lib")
 
 pixelflut_client::pixelflut_client(const std::string& addr,
-                                   const std::string& port) {
+                                   const std::string& port)
+    : _addr(addr), _port(port) {
     auto res = WSAStartup(MAKEWORD(2, 2), &_wsa_data);
     if (res)
         throw std::runtime_error(std::format("WSAStartup() failed: {}", res));
@@ -24,7 +25,7 @@ pixelflut_client::pixelflut_client(const std::string& addr,
         .ai_protocol = IPPROTO_TCP,
     };
 
-    res = getaddrinfo(addr.c_str(), port.c_str(), &hint, &_addrinfo);
+    res = getaddrinfo(_addr.c_str(), _port.c_str(), &hint, &_addrinfo);
     if (res)
         throw std::runtime_error(std::format("getaddrinfo() failed: {}", res));
 
@@ -110,6 +111,15 @@ void pixelflut_client::send_image(int32_t x_off, int32_t y_off,
 }
 
 void pixelflut_client::trace_rays(raytracer::grandma& granny) {
+    std::print("rendering scene:\n"
+               "\thost: {}:{}\n"
+               "\tresolution: {}x{} ({} pixels)\n"
+               "\tsample count: {}\n"
+               "\tray bounce limit: {}\n"
+               "\tobjects: {}\n",
+               _addr, _port, granny.width(), granny.height(),
+               granny.width() * granny.height(), granny.scene().samples(),
+               granny.scene().bounces(), granny.scene().objects().size());
     std::ranges::iota_view x_iota(0u, granny.width());
     std::ranges::iota_view y_iota(0u, granny.height());
 

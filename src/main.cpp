@@ -1,19 +1,29 @@
+#include "CLI/CLI.hpp"
 #include "image.hpp"
 #include "pixelflut.hpp"
 #include "raytracer/grandma.hpp"
-#include <algorithm>
-#include <execution>
-#include <iostream>
 #include <print>
-#include <ranges>
 #include <string>
+#include <vector>
 
 // TODO: proper error handling
-
-int32_t main(void) {
+int32_t main(int32_t argc, char** argv) {
     try {
-        pixelflut_client client("pixelflut.uwu.industries", "1234");
+        CLI::App app("pixelflut CPU raytracer", "grandma");
+        argv = app.ensure_utf8(argv);
+
+        std::string host, port;
+        app.add_option("--host", host, "pixelflut server URL");
+        app.add_option("--port", port, "pixelflut server port");
+
+        CLI11_PARSE(app, argc, argv);
+        if (host.empty() || port.empty())
+            throw std::runtime_error(std::format(
+                "only partial host address supplied: '{}:{}'", host, port));
+
+        pixelflut_client client(host, port);
         auto size = client.read_size();
+        size.y    = 256;
 
         namespace rt = raytracer;
 
@@ -34,15 +44,6 @@ int32_t main(void) {
         granny.scene().push_object(sphere0);
         granny.scene().push_object(sphere1);
         granny.scene().push_object(ground);
-
-        std::print("rendering scene:\n"
-                   "\tresolution: {}x{} ({} pixels)\n"
-                   "\tsample count: {}\n"
-                   "\tray bounce limit: {}\n"
-                   "\tobjects: {}\n",
-                   granny.width(), granny.height(),
-                   granny.width() * granny.height(), granny.scene().samples(),
-                   granny.scene().bounces(), granny.scene().objects().size());
 
         client.trace_rays(granny);
 

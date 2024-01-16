@@ -11,6 +11,7 @@ class pixelflut_client {
     SOCKET _socket;
     WSADATA _wsa_data;
     addrinfo* _addrinfo;
+    std::string _addr, _port;
 
   public:
     ~pixelflut_client();

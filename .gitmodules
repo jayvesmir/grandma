@@ -4,3 +4,6 @@
 [submodule "lib/glm"]
     path = lib/glm
     url = https://github.com/g-truc/glm
+[submodule "lib/cli11"]
+	path = lib/cli11
+	url = https://github.com/CLIUtils/CLI11
