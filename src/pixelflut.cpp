@@ -116,7 +116,7 @@ void pixelflut_client::trace_rays(raytracer::grandma& granny) {
     std::for_each(
         std::execution::par_unseq, x_iota.begin(), x_iota.end(), [&](auto x) {
             std::for_each(
-                std::execution::par, y_iota.begin(), y_iota.end(),
+                std::execution::par_unseq, y_iota.begin(), y_iota.end(),
                 [&](auto y) { send_pixel(x, y, granny.compute_pixel(x, y)); });
         });
 }

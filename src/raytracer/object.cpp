@@ -1,4 +1,5 @@
 #include "object.hpp"
+#include "scene.hpp"
 
 namespace raytracer {
     intersection sphere::intersect(const ray& ray) {
@@ -21,5 +22,7 @@ namespace raytracer {
         return out;
     }
 
-    rt_vec3 sphere::sample(const intersection& p) { return _mat->sample(p); }
+    material_sample sphere::sample(const intersection& p) {
+        return _mat->sample(p);
+    }
 } // namespace raytracer

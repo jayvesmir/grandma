@@ -19,8 +19,8 @@ namespace raytracer {
             return intersection::invalid();
         }
 
-        virtual rt_vec3 sample(const intersection& p [[maybe_unused]]) {
-            return intersection::invalid().pos;
+        virtual material_sample sample(const intersection& p [[maybe_unused]]) {
+            return {intersection::invalid().pos, {}};
         }
     };
 
@@ -42,6 +42,6 @@ namespace raytracer {
         constexpr const auto& radius() { return _radius; }
 
         intersection intersect(const ray& ray) override;
-        rt_vec3 sample(const intersection& p) override;
+        material_sample sample(const intersection& p) override;
     };
 } // namespace raytracer

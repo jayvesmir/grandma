@@ -23,19 +23,19 @@ namespace raytracer {
                                    (_pixel_delta_uv.u + _pixel_delta_uv.v);
     }
 
-    rt_vec3 camera::sample_offset() {
+    rt_vec3 camera::sample_offset() const {
         return ((-0.5 + random::scalar()) * _pixel_delta_uv.u) +
                ((-0.5 + random::scalar()) * _pixel_delta_uv.v);
     }
 
-    rt_vec3 scene::sample_direction(uint32_t x, uint32_t y) {
+    rt_vec3 scene::sample_direction(uint32_t x, uint32_t y) const {
         return ((_camera.top_left_corner() +
                  (static_cast<rt_scalar>(x) * _camera.pixel_delta_uv().u) +
                  (static_cast<rt_scalar>(y) * _camera.pixel_delta_uv().v)) +
                 _camera.sample_offset() - _camera.pos());
     }
 
-    hit scene::intersect_objects(const ray& ray) {
+    hit scene::intersect_objects(const ray& ray) const {
         hit closest = {false, intersection::invalid(), nullptr};
         for (auto& obj : _objects) {
             auto current = obj->intersect(ray);
@@ -46,28 +46,29 @@ namespace raytracer {
         return closest;
     }
 
-    rt_vec3 scene::trace_ray(const ray& ray) {
+    rt_vec3 scene::trace_ray(const ray& ray) const {
         auto bg_intersection       = intersection::invalid();
         bg_intersection.origin_ray = ray;
         if (_objects.size() == 0)
-            return _background_mat->sample(bg_intersection);
+            return _background_mat->sample(bg_intersection).color;
 
-        auto closest = intersect_objects(ray);
+        auto hit = intersect_objects(ray);
 
-        if (!closest.has_hit)
-            return _background_mat->sample(bg_intersection);
+        if (!hit.has_hit)
+            return _background_mat->sample(bg_intersection).color;
 
-        rt_vec3 color = closest.obj->sample(closest.point);
+        auto sample = hit.obj->sample(hit.point);
+        auto color  = sample.color;
+
         for (auto bounce = 0u; bounce < _max_bounces; bounce++) {
-            auto hit = intersect_objects(
-                {closest.point.pos,
-                 static_cast<rt_scalar>(0.5) * closest.point.normal +
-                     random::vector_within_bounce_range(closest.point.normal)});
+            auto hit = intersect_objects(sample.child);
 
-            if (hit.has_hit)
-                color *= _reflectance * hit.obj->sample(hit.point);
-            else {
-                color *= _reflectance * _background_mat->sample(hit.point);
+            if (hit.has_hit) {
+                sample = hit.obj->sample(hit.point);
+                color *= sample.color;
+            } else {
+                sample = _background_mat->sample(hit.point);
+                color *= sample.color;
                 break;
             }
         }
@@ -75,7 +76,7 @@ namespace raytracer {
         return color;
     };
 
-    rt_vec3 scene::trace_ray(uint32_t x, uint32_t y) {
+    rt_vec3 scene::trace_ray(uint32_t x, uint32_t y) const {
         rt_vec3 out_color(0.0, 0.0, 0.0);
         for (auto sample = 0u; sample < _max_samples; sample++)
             out_color += trace_ray({_camera.pos(), sample_direction(x, y)});

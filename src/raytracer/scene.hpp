@@ -37,30 +37,31 @@ namespace raytracer {
             return _top_left_corner;
         }
 
-        rt_vec3 sample_offset();
+        rt_vec3 sample_offset() const;
     };
 
     class scene {
         camera _camera;
-        rt_scalar _reflectance;
         uint32_t _max_bounces, _max_samples;
         std::shared_ptr<material> _background_mat;
         std::vector<std::shared_ptr<object>> _objects;
 
-        hit intersect_objects(const ray& ray);
-        rt_vec3 sample_direction(uint32_t x, uint32_t y);
+        hit intersect_objects(const ray& ray) const;
+        rt_vec3 sample_direction(uint32_t x, uint32_t y) const;
 
       public:
         scene(const camera& camera, uint32_t max_bounces = 12,
-              uint32_t max_samples = 32, rt_scalar reflectance = 0.7,
+              uint32_t max_samples = 32,
               const std::shared_ptr<material>& background_mat =
                   std::make_shared<sky_mat>())
-            : _camera(camera), _reflectance(reflectance),
-              _max_bounces(max_bounces), _max_samples(max_samples),
-              _background_mat(background_mat) {}
+            : _camera(camera), _max_bounces(max_bounces),
+              _max_samples(max_samples), _background_mat(background_mat) {}
 
         constexpr auto& camera() { return _camera; }
+        constexpr auto samples() const { return _max_samples; }
+        constexpr auto bounces() const { return _max_bounces; }
         constexpr const auto& objects() const { return _objects; }
+        constexpr const auto& background_mat() const { return _background_mat; }
 
         void push_object(const std::shared_ptr<object>& object) {
             _objects.push_back(object);
@@ -68,7 +69,7 @@ namespace raytracer {
 
         void pop_object() { _objects.pop_back(); }
 
-        rt_vec3 trace_ray(const ray& ray);
-        rt_vec3 trace_ray(uint32_t x, uint32_t y);
+        rt_vec3 trace_ray(const ray& ray) const;
+        rt_vec3 trace_ray(uint32_t x, uint32_t y) const;
     };
 } // namespace raytracer
