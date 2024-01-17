@@ -16,12 +16,19 @@ namespace random {
     }
 
     static inline auto vector_within_sphere() {
-        while (true) {
-            auto vec = vector(static_cast<rt_scalar>(-1.0),
-                              static_cast<rt_scalar>(1.0));
-            if (glm::dot(vec, vec) < static_cast<rt_scalar>(1.0))
-                return vec;
-        }
+        auto vec = vector(-1.0, 1.0);
+        while (glm::dot(vec, vec) > static_cast<rt_scalar>(1.0))
+            vec = vector(-1.0, 1.0);
+        return vec;
+    }
+
+    static inline auto vector_within_disk() {
+        auto vec = rt_vec3(scalar(-1.0, 1.0), scalar(-1.0, 1.0),
+                           static_cast<rt_scalar>(0.0));
+        while (glm::dot(vec, vec) > static_cast<rt_scalar>(1.0))
+            vec = rt_vec3(scalar(-1.0, 1.0), scalar(-1.0, 1.0),
+                          static_cast<rt_scalar>(0.0));
+        return vec;
     }
 
     static inline auto vector_within_bounce_range(const rt_vec3& normal) {

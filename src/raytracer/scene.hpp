@@ -16,28 +16,39 @@ namespace raytracer {
     };
 
     class camera {
-        uv _viewport_uv, _pixel_delta_uv;
+        uv _viewport, _pixel_delta, _bokeh_disk;
         rt_vec3 _pos, _target, _up, _top_left_corner, _u, _v, _w;
-        rt_scalar _width, _height, _focal_length, _fov;
+        rt_scalar _width, _height, _fov, _focus_distance, _bokeh_angle;
 
       public:
         camera() = default;
         camera(uint32_t image_width, uint32_t image_height,
-               rt_scalar fov = 90.0, rt_vec3 pos = rt_vec3(0.0, 0.0, 0.0),
-               rt_vec3 target = rt_vec3(0.0, 0.0, 0.0),
-               rt_vec3 up     = rt_vec3(0.0, 1.0, 0.0));
+               rt_scalar fov = 90.0, rt_scalar bokeh_angle = 0.0,
+               rt_scalar focus_distance = -1.0,
+               rt_vec3 pos              = rt_vec3(0.0, 0.0, 0.0),
+               rt_vec3 target           = rt_vec3(0.0, 0.0, 0.0),
+               rt_vec3 up               = rt_vec3(0.0, 1.0, 0.0));
 
         constexpr const auto& pos() const { return _pos; }
         constexpr auto pos(const rt_vec3& pos) { _pos = pos; }
+        constexpr const auto& target() const { return _target; }
+        constexpr auto target(const rt_vec3& target) { _target = target; }
+        constexpr const auto& up() const { return _up; }
+        constexpr auto up(const rt_vec3& up) { _up = up; }
+
+        constexpr const auto& fov() const { return _fov; }
         constexpr const auto& viewport_width() const { return _width; }
         constexpr const auto& viewport_height() const { return _height; }
-        constexpr const auto& viewport_uv() const { return _viewport_uv; }
-        constexpr const auto& focal_length() const { return _focal_length; }
-        constexpr const auto& pixel_delta_uv() const { return _pixel_delta_uv; }
+        constexpr const auto& viewport() const { return _viewport; }
+        constexpr const auto& focus_distance() const { return _focus_distance; }
+        constexpr const auto& bokeh_angle() const { return _bokeh_angle; }
+        constexpr const auto& pixel_delta() const { return _pixel_delta; }
+        constexpr const auto& bokeh_disk() const { return _bokeh_disk; }
         constexpr const auto& top_left_corner() const {
             return _top_left_corner;
         }
 
+        rt_vec3 bokeh_sample() const;
         rt_vec3 sample_offset() const;
     };
 

@@ -14,12 +14,12 @@ int32_t main(int32_t argc, char** argv) {
 
         namespace rt = raytracer;
 
-        rt::camera cam(size.x, size.y, 30.0, {-2.0, 3.5, 7.0},
-                       {0.0, 0.75, 0.0});
+        rt::camera cam(size.x, size.y, 30.0, 15.0, -1.0, {-2.0, 1.0, 5.0},
+                       {2 / 3.0, 1.0, -0.75});
         rt::grandma granny({cam, 32, 256}, size.x, size.y);
 
         auto sphere_matte = std::make_shared<rt::sphere>(
-            rt_vec3{-2 / 3.0, 0.5, 0.0}, 0.5,
+            rt_vec3{-2.0, 0.75, 2.0}, 0.75,
             std::make_shared<rt::matte_sphere_mat>());
         auto sphere_mirror = std::make_shared<rt::sphere>(
             rt_vec3{2 / 3.0, 1.0, -0.75}, 1.0,
